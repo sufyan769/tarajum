@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تفاصيل العالم</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@400;600;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --wiki-border: #a2a9b1;
+      --wiki-bg: #ffffff;
+      --wiki-link: #3366cc;
+      --wiki-gray: #f8f9fa;
+    }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: var(--wiki-bg);
+      color: #202122;
+    }
+    .font-serif-header {
+      font-family: 'Amiri', serif;
+    }
+    .font-content {
+      font-family: 'Scheherazade New', 'Amiri', serif;
+    }
+    .wiki-title {
+      border-bottom: 1px solid var(--wiki-border);
+    }
+    /* Info Box Style */
+    .infobox {
+      background-color: #f8f9fa;
+      border: 1px solid #a2a9b1;
+      padding: 0.5rem;
+      font-size: 0.9rem;
+    }
+    .infobox th {
+      background-color: #eaecf0;
+      text-align: center;
+      padding: 5px;
+    }
+    .text-justify-arabic {
+      text-align: justify;
+      text-justify: inter-word;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-white pb-10">
+
+  <!-- Wiki Header -->
+  <nav class="border-b border-[#a2a9b1] bg-[#f8f9fa] mb-6 print:hidden">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <a href="index.html" class="font-serif font-bold text-xl flex items-center gap-2 hover:underline">
+            <div class="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-sm">و</div>
+            الموسوعة
+        </a>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <button id="searchBackBtn" class="text-sm font-bold text-[#3366cc] hover:underline flex items-center gap-1">
+             <i data-lucide="search" class="w-4 h-4"></i>
+             بحث
+        </button>
+        <span class="text-stone-300">|</span>
+        <button id="editBtn" class="text-sm font-bold text-[#3366cc] hover:underline flex items-center gap-1">
+            <i data-lucide="pencil" class="w-4 h-4"></i>
+            تعديل
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-4">
+
+    <!-- Loading -->
+    <div id="loadingSpinner" class="flex items-center justify-center h-64">
+        <div class="w-8 h-8 border-4 border-stone-800 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+
+    <!-- Article View -->
+    <div id="viewContainer" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Main Content -->
+      <div class="lg:col-span-9 order-2 lg:order-1">
+        
+        <!-- Article Title -->
+        <div class="mb-4">
+          <h1 id="viewName" class="text-4xl font-serif-header font-bold text-black pb-2 wiki-title"></h1>
+          <p class="text-sm text-stone-500 mt-1">من الموسوعة الحرة</p>
+        </div>
+
+        <!-- Controls (Font Size) -->
+        <div class="flex items-center gap-2 mb-4 print:hidden">
+           <button id="decreaseFont" class="px-2 py-1 bg-stone-100 border border-stone-300 rounded text-xs hover:bg-stone-200">A-</button>
+           <button id="increaseFont" class="px-2 py-1 bg-stone-100 border border-stone-300 rounded text-xs hover:bg-stone-200">A+</button>
+        </div>
+
+        <!-- Body Text -->
+        <div id="viewTrj" class="font-content text-black leading-relaxed text-justify-arabic" style="font-size: 22px;">
+           <!-- Content -->
+        </div>
+      </div>
+
+      <!-- InfoBox (Sidebar) -->
+      <div class="lg:col-span-3 order-1 lg:order-2">
+        <div class="infobox w-full lg:w-full max-w-xs mx-auto lg:mx-0 shadow-sm">
+           <table class="w-full border-collapse">
+             <thead>
+               <tr>
+                 <th colspan="2" id="infoBoxTitle" class="font-serif-header text-lg font-bold border-b border-[#a2a9b1] py-2">
+                   <!-- Name -->
+                 </th>
+               </tr>
+             </thead>
+             <tbody class="text-sm">
+               <tr>
+                 <td colspan="2" class="text-center py-3 border-b border-stone-200">
+                   <i data-lucide="book-open" class="w-16 h-16 mx-auto text-stone-400"></i>
+                 </td>
+               </tr>
+               <tr class="border-b border-stone-200">
+                 <td class="font-bold p-2 w-1/3 align-top">الاسم الكامل</td>
+                 <td id="infoBoxFull" class="p-2 align-top text-stone-700"></td>
+               </tr>
+               <tr class="border-b border-stone-200">
+                 <td class="font-bold p-2 align-top">تاريخ الوفاة</td>
+                 <td id="infoBoxDeath" class="p-2 align-top text-stone-700"></td>
+               </tr>
+               <tr class="border-b border-stone-200">
+                 <td class="font-bold p-2 align-top">المعرف</td>
+                 <td id="infoBoxId" class="p-2 align-top font-mono text-xs text-stone-500"></td>
+               </tr>
+                <tr>
+                 <td class="font-bold p-2 align-top">التصنيف</td>
+                 <td id="infoBoxRank" class="p-2 align-top text-stone-700"></td>
+               </tr>
+             </tbody>
+           </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Edit Modal (Overlay) -->
+    <div id="editContainer" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col">
+        
+        <div class="flex items-center justify-between p-4 border-b border-stone-200">
+          <h3 class="font-bold text-lg">تعديل المصدر</h3>
+          <button id="cancelBtnTop" class="text-stone-500 hover:text-red-500">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="p-6 space-y-4 flex-1 overflow-y-auto">
+           <div>
+            <label class="block text-sm font-bold text-stone-700 mb-1">عنوان المقالة</label>
+            <input id="inputName" class="w-full p-2 border border-stone-300 focus:border-[#3366cc] outline-none" />
+          </div>
+          
+          <div>
+            <label class="block text-sm font-bold text-stone-700 mb-1">الاسم الكامل</label>
+            <input id="inputFull" class="w-full p-2 border border-stone-300 focus:border-[#3366cc] outline-none" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-bold text-stone-700 mb-1">تاريخ الوفاة</label>
+              <input id="inputDeath" class="w-full p-2 border border-stone-300 focus:border-[#3366cc] outline-none" />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-stone-700 mb-1">الترتيب</label>
+              <input id="inputRank" type="number" class="w-full p-2 border border-stone-300 focus:border-[#3366cc] outline-none" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-stone-700 mb-1">نص المقالة</label>
+            <textarea id="inputTrj" rows="10" class="w-full p-2 border border-stone-300 focus:border-[#3366cc] outline-none font-content text-lg leading-relaxed"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-stone-700 mb-1">كلمات مفتاحية (Aliases)</label>
+            <textarea id="inputAliases" rows="2" class="w-full p-2 border border-stone-300 focus:border-[#3366cc] outline-none text-sm"></textarea>
+          </div>
+        </div>
+
+        <div class="p-4 border-t border-stone-200 bg-stone-50 flex justify-end gap-2">
+           <button id="cancelBtn" class="px-4 py-2 bg-white border border-stone-300 hover:bg-stone-100 rounded text-sm">إلغاء</button>
+           <button id="saveBtn" class="px-4 py-2 bg-[#3366cc] text-white hover:bg-[#2a4b8d] rounded text-sm font-bold flex items-center gap-2">
+             <span id="saveText">نشر التغييرات</span>
+             <div id="saveSpinner" class="hidden w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+           </button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    lucide.createIcons();
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBni4eUpBlMrBVr-I-_bTLDyYpdJgkBnpw",
+      authDomain: "islsm-9.firebaseapp.com",
+      projectId: "islsm-9",
+      storageBucket: "islsm-9.firebasestorage.app",
+      messagingSenderId: "940034885206",
+      appId: "1:940034885206:web:4013d7a5297f2ff7b41df7",
+      measurementId: "G-JF11WVCY5P"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const CACHE_KEY = 'scholar_search_cache';
+
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const viewContainer = document.getElementById('viewContainer');
+    const editContainer = document.getElementById('editContainer');
+
+    // Buttons
+    const editBtn = document.getElementById('editBtn');
+    const searchBackBtn = document.getElementById('searchBackBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const cancelBtnTop = document.getElementById('cancelBtnTop');
+    const saveBtn = document.getElementById('saveBtn');
+    const saveText = document.getElementById('saveText');
+    const saveSpinner = document.getElementById('saveSpinner');
+
+    const increaseFontBtn = document.getElementById('increaseFont');
+    const decreaseFontBtn = document.getElementById('decreaseFont');
+
+    // View Fields
+    const viewName = document.getElementById('viewName');
+    const viewTrj = document.getElementById('viewTrj');
+    // InfoBox fields
+    const infoBoxTitle = document.getElementById('infoBoxTitle');
+    const infoBoxFull = document.getElementById('infoBoxFull');
+    const infoBoxDeath = document.getElementById('infoBoxDeath');
+    const infoBoxId = document.getElementById('infoBoxId');
+    const infoBoxRank = document.getElementById('infoBoxRank');
+
+    // Inputs
+    const inputName = document.getElementById('inputName');
+    const inputFull = document.getElementById('inputFull');
+    const inputDeath = document.getElementById('inputDeath');
+    const inputRank = document.getElementById('inputRank');
+    const inputTrj = document.getElementById('inputTrj');
+    const inputAliases = document.getElementById('inputAliases');
+
+    // Logic
+    const params = new URLSearchParams(window.location.search);
+    const docId = params.get("id");
+    let currentScholarData = null;
+    let currentFontSize = 22;
+
+    // Back Button Logic
+    searchBackBtn.addEventListener('click', () => {
+       // If history is available, go back (preserves scroll and state in index.html)
+       if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) {
+           history.back();
+       } else {
+           window.location.href = 'index.html';
+       }
+    });
+
+    // Font Size
+    function updateFontSize() {
+      viewTrj.style.fontSize = `${currentFontSize}px`;
+      viewTrj.style.lineHeight = `${currentFontSize * 0.13}`; 
+    }
+    increaseFontBtn.addEventListener('click', () => {
+        if(currentFontSize < 40) { currentFontSize+=2; updateFontSize(); }
+    });
+    decreaseFontBtn.addEventListener('click', () => {
+        if(currentFontSize > 14) { currentFontSize-=2; updateFontSize(); }
+    });
+
+    // Load
+    async function loadDetails() {
+      if (!docId) return;
+      
+      try {
+        const ref = doc(db, "scholars_biographies", docId);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+          loadingSpinner.innerHTML = "المقالة غير موجودة";
+          return;
+        }
+
+        currentScholarData = snap.data();
+        renderView(currentScholarData);
+        loadingSpinner.classList.add('hidden');
+        viewContainer.classList.remove('hidden');
+
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function renderView(data) {
+      viewName.textContent = data.name || 'بدون عنوان';
+      
+      // Info Box
+      infoBoxTitle.textContent = data.name || '';
+      infoBoxFull.textContent = data.full || '-';
+      infoBoxDeath.textContent = data.death || '-';
+      infoBoxId.textContent = docId;
+      infoBoxRank.textContent = data.rank || '-';
+
+      // Content
+      viewTrj.innerHTML = '';
+      if (data.trj) {
+        const formattedText = data.trj.replace(/\./g, '.\n');
+        const paragraphs = formattedText.split('\n');
+        
+        paragraphs.forEach(pText => {
+            const clean = pText.trim();
+            if (clean) {
+                const p = document.createElement('p');
+                p.className = "mb-4";
+                p.textContent = clean;
+                viewTrj.appendChild(p);
+            }
+        });
+      } else {
+          viewTrj.innerHTML = '<p class="italic text-stone-500">هذه المقالة بذرة. يمكنك المساهمة في إثرائها.</p>';
+      }
+    }
+
+    // Edit Logic
+    function openEdit() {
+        if(!currentScholarData) return;
+        inputName.value = currentScholarData.name || '';
+        inputFull.value = currentScholarData.full || '';
+        inputDeath.value = currentScholarData.death || '';
+        inputRank.value = currentScholarData.rank || 0;
+        inputTrj.value = currentScholarData.trj || '';
+        inputAliases.value = currentScholarData.aliases ? currentScholarData.aliases.join(' | ') : '';
+        
+        editContainer.classList.remove('hidden');
+    }
+    
+    function closeEdit() {
+        editContainer.classList.add('hidden');
+    }
+
+    async function saveChanges() {
+        saveBtn.disabled = true;
+        saveText.textContent = "...";
+        saveSpinner.classList.remove('hidden');
+
+        try {
+            const newData = {
+                name: inputName.value.trim(),
+                full: inputFull.value.trim(),
+                death: inputDeath.value.trim(),
+                trj: inputTrj.value.trim(),
+                rank: Number(inputRank.value),
+                aliases: inputAliases.value.split('|').map(x=>x.trim()).filter(x=>x)
+            };
+            
+            await updateDoc(doc(db, "scholars_biographies", docId), newData);
+            currentScholarData = newData;
+            renderView(newData);
+
+            // Update Search Cache if exists
+            try {
+                const c = sessionStorage.getItem(CACHE_KEY);
+                if(c) {
+                    const parsed = JSON.parse(c);
+                    if(parsed.docs) {
+                        const idx = parsed.docs.findIndex(d => d.id === docId);
+                        if(idx !== -1) {
+                            parsed.docs[idx] = { ...parsed.docs[idx], ...newData };
+                            sessionStorage.setItem(CACHE_KEY, JSON.stringify(parsed));
+                        }
+                    }
+                }
+            } catch(e){}
+
+            closeEdit();
+        } catch(e) {
+            alert("حدث خطأ أثناء الحفظ");
+        } finally {
+            saveBtn.disabled = false;
+            saveText.textContent = "نشر التغييرات";
+            saveSpinner.classList.add('hidden');
+        }
+    }
+
+    editBtn.addEventListener('click', openEdit);
+    cancelBtn.addEventListener('click', closeEdit);
+    cancelBtnTop.addEventListener('click', closeEdit);
+    saveBtn.addEventListener('click', saveChanges);
+
+    loadDetails();
+  </script>
+</body>
+</html>

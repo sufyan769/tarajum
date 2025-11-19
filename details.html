@@ -217,6 +217,9 @@
       getDoc,
       updateDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    
+    // Algolia Client Import
+    import algoliasearch from 'https://cdn.jsdelivr.net/npm/algoliasearch@4.22.1/dist/algoliasearch-lite.esm.browser.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyBni4eUpBlMrBVr-I-_bTLDyYpdJgkBnpw",
@@ -230,6 +233,15 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    
+    // Algolia Config
+    const ALGOLIA_APP_ID = "3XD12I7386";
+    const ALGOLIA_API_KEY = "981ea91e88c65be8aadf2113c207b9c5"; 
+    const ALGOLIA_INDEX_NAME = "trajum";
+    
+    const algoliaClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_API_KEY);
+    const algoliaIndex = algoliaClient.initIndex(ALGOLIA_INDEX_NAME);
+
     const CACHE_KEY = 'scholar_search_cache';
 
     const loadingSpinner = document.getElementById('loadingSpinner');
@@ -379,11 +391,23 @@
                 aliases: inputAliases.value.split('|').map(x=>x.trim()).filter(x=>x)
             };
             
+            // 1. Update Firebase
             await updateDoc(doc(db, "scholars_biographies", docId), newData);
+            
+            // 2. Update Algolia (Sync)
+            try {
+                await algoliaIndex.saveObject({
+                    objectID: docId,
+                    ...newData
+                });
+            } catch(algoliaErr) {
+                console.error("Algolia Sync Error:", algoliaErr);
+            }
+
             currentScholarData = newData;
             renderView(newData);
 
-            // Update Search Cache if exists
+            // Update Local Search Cache if exists
             try {
                 const c = sessionStorage.getItem(CACHE_KEY);
                 if(c) {
@@ -401,6 +425,7 @@
             closeEdit();
         } catch(e) {
             alert("حدث خطأ أثناء الحفظ");
+            console.error(e);
         } finally {
             saveBtn.disabled = false;
             saveText.textContent = "نشر التغييرات";
